@@ -171,7 +171,7 @@
   <div class="card">
     <div class="row">
       <div class="col">
-        <div>Current Balance</div>
+        <div>Current Balance Owed</div>
         <div class="balance" id="currentBalance">$0.00</div>
         <div class="status-bar" id="summaryStats"></div>
       </div>
@@ -283,6 +283,19 @@
       return sign + '$' + Math.abs(n).toFixed(2);
     }
 
+    // Interpret sheet data so:
+    // - Charges add to what Pike owes (positive)
+    // - Payments subtract from what Pike owes (negative)
+    function normalizedAmount(row) {
+      const amt = Number(row.amount) || 0;
+      if (row.type === 'expense') {
+        return amt;      // charge increases owed
+      } else if (row.type === 'income') {
+        return -amt;     // payment reduces owed
+      }
+      return amt;
+    }
+
     function computeStats(rows) {
       let balance = 0;
       let totalCharges = 0;
@@ -291,19 +304,23 @@
       const byType = { expense: 0, income: 0 };
 
       for (const row of rows) {
-        const amt = Number(row.amount) || 0;
+        const norm = normalizedAmount(row);
+
+        // balance is sum of normalized amounts
+        balance += norm;
+
         if (row.type === 'expense') {
-          balance -= amt;
-          totalCharges += amt;
+          totalCharges += Math.abs(norm);
         } else if (row.type === 'income') {
-          balance += amt;
-          totalPayments += amt;
+          totalPayments += Math.abs(norm);
         }
+
         const cat = row.category || 'other';
         if (!byCategory[cat]) byCategory[cat] = 0;
-        byCategory[cat] += amt;
+        byCategory[cat] += Math.abs(norm);
+
         if (!byType[row.type]) byType[row.type] = 0;
-        byType[row.type] += amt;
+        byType[row.type] += Math.abs(norm);
       }
 
       return { balance, totalCharges, totalPayments, byCategory, byType };
@@ -324,7 +341,8 @@
         tr.appendChild(descTd);
 
         const amtTd = document.createElement('td');
-        amtTd.textContent = formatMoney(row.amount);
+        // Show the original entered amount (positive)
+        amtTd.textContent = '$' + (Number(row.amount) || 0).toFixed(2);
         tr.appendChild(amtTd);
 
         const catTd = document.createElement('td');
@@ -348,7 +366,10 @@
 
     function renderSummary(rows) {
       const stats = computeStats(rows);
-      currentBalanceEl.textContent = formatMoney(stats.balance);
+
+      // Clamp negative balance to 0 (no “-1 owed” weirdness)
+      const displayBalance = stats.balance < 0 ? 0 : stats.balance;
+      currentBalanceEl.textContent = formatMoney(displayBalance);
 
       summaryStatsEl.textContent =
         'Total charges: ' + formatMoney(stats.totalCharges) +
