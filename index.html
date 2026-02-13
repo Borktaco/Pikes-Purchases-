@@ -324,8 +324,6 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwJZCrTzRIRj0MkuDrGhWmy
 let history = [];
 let balance = 0;
 
-// --- helpers ---
-
 function formatMoney(a) {
     return '$' + a.toFixed(2);
 }
@@ -334,10 +332,10 @@ function showNotification(msg) {
     const n = document.getElementById('notification');
     n.textContent = msg;
     n.classList.add('show');
-    setTimeout(()=>n.classList.remove('show'), 2000);
+    setTimeout(()=>n.classList.remove('show'), 2500);
 }
 
-// --- backend calls ---
+// ----- backend -----
 
 async function fetchHistoryFromServer() {
     const res = await fetch(API_URL);
@@ -352,12 +350,20 @@ async function postEntryToServer(entry) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(entry)
     });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || 'Failed to save');
+    const text = await res.text();
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch (e) {
+        throw new Error('Bad JSON from server: ' + text);
+    }
+    if (!data.success) {
+        throw new Error(data.error || 'Failed to save');
+    }
     history = data.history || [];
 }
 
-// --- calculations & UI ---
+// ----- UI + calculations -----
 
 function recomputeTotals() {
     balance = 0;
@@ -467,7 +473,7 @@ function drawCategoryChart() {
         ' (historic + new, shared via Google Sheets).';
 }
 
-// --- actions ---
+// ----- actions -----
 
 async function refreshFromServer() {
     try {
@@ -477,7 +483,7 @@ async function refreshFromServer() {
         drawCategoryChart();
     } catch (e) {
         console.error(e);
-        showNotification('Error loading data');
+        showNotification('Load error: ' + e.message);
     }
 }
 
@@ -493,7 +499,7 @@ async function addPurchase() {
     const category = catEl.value || 'Other';
 
     if (!desc) { showNotification('Add a description.'); return; }
-    if (isNaN(amount) || amount <= 0) { showNotification('Enter a valid positive amount.'); return; }
+    if (isNaN(amount) || amount <= 0) { showNotification('Enter a valid amount.'); return; }
 
     try {
         await postEntryToServer({
@@ -509,10 +515,10 @@ async function addPurchase() {
         drawCategoryChart();
         descEl.value = '';
         amtEl.value = '';
-        showNotification('Purchase saved for Pike (shared).');
+        showNotification('Purchase saved.');
     } catch (e) {
         console.error(e);
-        showNotification('Error saving purchase');
+        showNotification('Save error: ' + e.message);
     }
 }
 
@@ -534,16 +540,15 @@ async function markPaidInFull() {
             settled: true
         });
         await refreshFromServer();
-        showNotification('Marked as paid in full (shared).');
+        showNotification('Marked paid in full.');
     } catch (e) {
         console.error(e);
-        showNotification('Error marking paid in full');
+        showNotification('Paid-in-full error: ' + e.message);
     }
 }
 
 // Init
 refreshFromServer();
-window.addEventListener('load', drawCategoryChart);
 window.addEventListener('resize', drawCategoryChart);
 </script>
 </body>
