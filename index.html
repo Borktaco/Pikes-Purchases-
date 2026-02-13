@@ -1,606 +1,493 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Pikes Purchases</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-
-        body {
-            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-            background-color:#020b08;
-            min-height:100vh;
-            padding:20px 15px 120px;
-            overflow-x:hidden;
-            color:#e5f5ea;
-        }
-
-        .container { max-width:900px; margin:0 auto; }
-
-        .header {
-            background:linear-gradient(135deg,#066b3a,#0b8749);
-            border-radius:20px;
-            padding:20px;
-            text-align:center;
-            box-shadow:0 8px 24px rgba(0,0,0,0.6);
-            margin-bottom:14px;
-            border:1px solid rgba(255,255,255,0.08);
-        }
-
-        .header h1 {
-            color:#fdfefc;
-            font-size:26px;
-            font-weight:700;
-            margin-bottom:4px;
-        }
-
-        .header .subtitle {
-            color:rgba(240,255,244,0.9);
-            font-size:13px;
-            font-weight:500;
-        }
-
-        .badge-row { margin-bottom:16px; }
-
-        .badge {
-            background:rgba(7,36,24,0.95);
-            border-radius:18px;
-            padding:12px 16px;
-            box-shadow:0 3px 14px rgba(0,0,0,0.6);
-            border:1px solid rgba(255,255,255,0.08);
-        }
-
-        .badge-label {
-            font-size:11px;
-            color:#9fb8aa;
-            font-weight:600;
-            text-transform:uppercase;
-            letter-spacing:0.5px;
-            margin-bottom:4px;
-        }
-
-        .badge-value {
-            font-size:22px;
-            font-weight:700;
-            color:#f5fff8;
-        }
-
-        .card {
-            background:rgba(5,24,16,0.96);
-            border-radius:18px;
-            padding:18px;
-            margin-bottom:14px;
-            box-shadow:0 4px 18px rgba(0,0,0,0.7);
-            border:1px solid rgba(255,255,255,0.06);
-        }
-
-        .card-header {
-            font-size:15px;
-            font-weight:700;
-            color:#c4f5d7;
-            margin-bottom:10px;
-            text-transform:uppercase;
-            letter-spacing:0.5px;
-        }
-
-        .form-grid {
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-            gap:10px;
-            margin-bottom:10px;
-        }
-
-        .input-group label {
-            display:block;
-            font-size:12px;
-            color:#a7c4b5;
-            margin-bottom:4px;
-            font-weight:600;
-        }
-
-        .input-group input,
-        .input-group select {
-            width:100%;
-            padding:10px 12px;
-            border:1px solid #355243;
-            border-radius:10px;
-            font-size:14px;
-            background:#071712;
-            color:#e8fff2;
-            transition:all 0.25s;
-        }
-
-        .input-group input::placeholder { color:#5d7568; }
-
-        .input-group input:focus,
-        .input-group select:focus {
-            outline:none;
-            border-color:#4caf6f;
-            background:#0c2216;
-        }
-
-        .button-row {
-            display:flex;
-            flex-wrap:wrap;
-            gap:10px;
-            margin-top:4px;
-        }
-
-        .btn {
-            flex:0 0 auto;
-            padding:11px 16px;
-            border:none;
-            border-radius:12px;
-            font-size:14px;
-            font-weight:700;
-            cursor:pointer;
-            transition:all 0.2s;
-            box-shadow:0 3px 14px rgba(0,0,0,0.6);
-            text-transform:uppercase;
-            letter-spacing:0.5px;
-        }
-
-        .btn-add {
-            background:linear-gradient(135deg,#2eaf5d,#4dd27a);
-            color:#021007;
-        }
-
-        .btn-paid {
-            background:linear-gradient(135deg,#d23a3a,#ff784e);
-            color:#1b0505;
-        }
-
-        .btn:active { transform:scale(0.96); }
-
-        .chart-shell { display:flex; flex-direction:column; gap:6px; }
-
-        .chart-meta { font-size:12px; color:#a2b8ab; }
-
-        .chart-canvas-wrap {
-            background:#040e0a;
-            border-radius:12px;
-            padding:10px;
-            border:1px dashed rgba(255,255,255,0.1);
-        }
-
-        canvas { width:100%; max-height:220px; }
-
-        .history-header-row {
-            display:flex;
-            flex-wrap:wrap;
-            gap:10px;
-            align-items:flex-end;
-            margin-bottom:8px;
-        }
-
-        .history-list {
-            max-height:320px;
-            overflow-y:auto;
-            padding-right:4px;
-        }
-
-        .history-item {
-            display:grid;
-            grid-template-columns:80px 1fr 90px;
-            gap:8px;
-            padding:8px 0;
-            border-bottom:1px solid #1a2a20;
-            font-size:13px;
-            align-items:center;
-        }
-
-        .history-item:last-child { border-bottom:none; }
-
-        .h-date {
-            color:#7f9387;
-            font-weight:600;
-        }
-
-        .h-main { color:#e5f5ea; }
-
-        .h-desc { font-weight:600; }
-
-        .h-note {
-            font-size:11px;
-            color:#7e9688;
-        }
-
-        .h-amt {
-            text-align:right;
-            font-weight:700;
-        }
-
-        .h-amt.negative { color:#ff8a8a; }
-        .h-amt.positive { color:#8dffb0; }
-
-        .h-bal {
-            font-size:11px;
-            color:#7e9688;
-            text-align:right;
-        }
-
-        .notification {
-            position:fixed;
-            bottom:20px;
-            left:50%;
-            transform:translateX(-50%);
-            background:#06140d;
-            padding:10px 18px;
-            border-radius:999px;
-            box-shadow:0 4px 18px rgba(0,0,0,0.8);
-            font-size:13px;
-            font-weight:600;
-            display:none;
-            z-index:1000;
-            color:#e9fff5;
-            border:1px solid #2f4b3a;
-        }
-
-        .notification.show { display:block; }
-
-        @media (max-width:600px) {
-            .history-item {
-                grid-template-columns:70px 1fr;
-                grid-template-rows:auto auto;
-            }
-            .h-amt,
-            .h-bal { text-align:left; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Pike Purchases</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background: #0b1b2b;
+      color: #f5f7fb;
+    }
+    h1 {
+      text-align: center;
+      color: #e6f1ff;
+    }
+    .card {
+      background: #142237;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.35);
+    }
+    label {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #c2d4f2;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+      border-radius: 8px;
+      border: 1px solid #31415f;
+      background: #0f1a2a;
+      color: #f5f7fb;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 0.75rem;
+      padding: 0.6rem 1rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      background: #00c46a;
+      color: #04101f;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    }
+    button.secondary {
+      background: #1f2f4a;
+      color: #e6f1ff;
+      margin-left: 0.5rem;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .col {
+      flex: 1 1 240px;
+    }
+    .balance {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    .tag {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      margin-left: 0.25rem;
+      background: #243556;
+      color: #a9c3ff;
+      vertical-align: middle;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+    }
+    th, td {
+      padding: 0.4rem 0.5rem;
+      border-bottom: 1px solid #1f2f3d;
+      text-align: left;
+    }
+    th {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #8fa2c7;
+    }
+    tr.income td {
+      color: #6fffb0;
+    }
+    tr.expense td {
+      color: #ff9f9f;
+    }
+    .pill {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: #223351;
+      color: #c2d4f2;
+    }
+    .chart-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+    .chart-box {
+      flex: 1 1 260px;
+      min-height: 160px;
+      background: #0f1a2a;
+      border-radius: 10px;
+      padding: 0.5rem;
+      border: 1px solid #223351;
+      font-size: 0.8rem;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: #132544;
+      margin: 0.15rem;
+      font-size: 0.7rem;
+    }
+    .chip span {
+      margin-left: 0.25rem;
+      color: #9fb4dd;
+    }
+    .status-bar {
+      font-size: 0.8rem;
+      color: #9fb4dd;
+      margin-top: 0.5rem;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      background: #1a2b48;
+      font-size: 0.7rem;
+      margin-right: 0.25rem;
+    }
+    .error {
+      color: #ff9f9f;
+      margin-top: 0.3rem;
+      font-size: 0.8rem;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 0.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>The Pikes Purchases</h1>
-        <div class="subtitle">Account of what Pike owes for movies, subscriptions, games, and extras.</div>
-    </div>
+  <h1>Pike Purchases</h1>
 
-    <!-- CURRENT BALANCE BY ITSELF -->
-    <div class="badge-row">
-        <div class="badge">
-            <div class="badge-label">Current Balance Owed</div>
-            <div class="badge-value" id="balanceOwed">$0.00</div>
+  <div class="card">
+    <div class="row">
+      <div class="col">
+        <div>Current Balance</div>
+        <div class="balance" id="currentBalance">$0.00</div>
+        <div class="status-bar" id="summaryStats"></div>
+      </div>
+      <div class="col">
+        <label>
+          Quick filters
+        </label>
+        <div>
+          <button class="secondary" type="button" id="filterAll">All</button>
+          <button class="secondary" type="button" id="filterSubscriptions">Subscriptions</button>
+          <button class="secondary" type="button" id="filterMovies">Movies</button>
+          <button class="secondary" type="button" id="filterGames">Games</button>
         </div>
-    </div>
-
-    <div class="card">
-        <div class="card-header">Add New Purchase</div>
-        <div class="form-grid">
-            <div class="input-group">
-                <label>Date</label>
-                <input type="date" id="dateInput">
-            </div>
-            <div class="input-group">
-                <label>Description</label>
-                <input type="text" id="descInput" placeholder="Movie, subscription, game…">
-            </div>
-            <div class="input-group">
-                <label>Cost (USD)</label>
-                <input type="number" id="amountInput" step="0.01" inputmode="decimal" placeholder="0.00">
-            </div>
-            <div class="input-group">
-                <label>Category</label>
-                <select id="categoryInput">
-                    <option value="Movies">Movies</option>
-                    <option value="Subscriptions">Subscriptions</option>
-                    <option value="Games/Robux">Games/Robux</option>
-                    <option value="Events/Trips">Events/Trips</option>
-                    <option value="Other" selected>Other</option>
-                </select>
-            </div>
+        <div class="status-bar">
+          <span class="status-badge" id="filterLabel">Showing: All</span>
+          <span id="rowCountLabel"></span>
         </div>
-        <div class="button-row">
-            <button class="btn btn-add" onclick="addPurchase()">Add Purchase</button>
-            <button class="btn btn-paid" onclick="markPaidInFull()">Mark Paid in Full</button>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="card">
-        <div class="card-header">Spending by Category (Smaller View)</div>
-        <div class="chart-shell">
-            <div class="chart-meta" id="chartMeta">
-                Total spent across categories includes all historic purchases plus anything new.[file:199]
-            </div>
-            <div class="chart-canvas-wrap">
-                <canvas id="categoryChart"></canvas>
-            </div>
-        </div>
+  <div class="card">
+    <h2 style="margin-top:0;">Add purchase or payment</h2>
+    <div class="row">
+      <div class="col">
+        <label for="desc">Description</label>
+        <input id="desc" type="text" placeholder="Movie, game, subscription..." />
+
+        <label for="amount">Amount</label>
+        <input id="amount" type="number" step="0.01" placeholder="12.99" />
+      </div>
+      <div class="col">
+        <label for="category">Category</label>
+        <select id="category">
+          <option value="subscription">Subscription</option>
+          <option value="movie">Movie</option>
+          <option value="game">Game</option>
+          <option value="other">Other</option>
+        </select>
+
+        <label for="type">Type</label>
+        <select id="type">
+          <option value="expense">Charge (money going out)</option>
+          <option value="income">Payment (money coming in)</option>
+        </select>
+      </div>
     </div>
+    <button id="addBtn" type="button">Save to Pike sheet</button>
+    <span id="saveSpinner" style="margin-left:0.5rem; font-size:0.8rem; display:none;">Saving…</span>
+    <div id="formError" class="error"></div>
+  </div>
 
-    <div class="card">
-        <div class="history-header-row">
-            <div class="card-header">History of Purchases & Payments</div>
-        </div>
-        <div class="history-list" id="historyList"></div>
+  <div class="card">
+    <h2 style="margin-top:0;">History</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Amount</th>
+          <th>Category</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Snapshots</h2>
+    <div class="chart-row">
+      <div class="chart-box" id="categorySummaryBox">
+        <strong>By category (lifetime)</strong>
+        <div id="categoryChips"></div>
+      </div>
+      <div class="chart-box" id="typeSummaryBox">
+        <strong>Charges vs payments</strong>
+        <div id="typeChips"></div>
+      </div>
     </div>
-</div>
+  </div>
 
-<div class="notification" id="notification"></div>
+  <script>
+    // Your real live API URL for Pike:
+    const API_URL = "https://script.google.com/macros/s/AKfycbzgR8n39Zbf-hZmC-4qVnupel-VVO2-ExljH4RZaeDukLaj9XhGi7ub0Y7EQP4psSaV/exec";
 
-<script>
-const STORAGE_KEY = 'pikePurchases_dark_final';
+    const historyBody = document.getElementById('historyBody');
+    const currentBalanceEl = document.getElementById('currentBalance');
+    const summaryStatsEl = document.getElementById('summaryStats');
+    const categoryChipsEl = document.getElementById('categoryChips');
+    const typeChipsEl = document.getElementById('typeChips');
+    const filterLabel = document.getElementById('filterLabel');
+    const rowCountLabel = document.getElementById('rowCountLabel');
+    const formError = document.getElementById('formError');
+    const addBtn = document.getElementById('addBtn');
+    const saveSpinner = document.getElementById('saveSpinner');
 
-/*
- All seeded rows are historic purchases, marked settled:true, and there are
- NO negative amounts in the seed, so starting balance is 0.00.[file:199]
-*/
-const seededHistory = [
-    // NEW tab 2025 (no -100 row)[file:199]
-    {date:'2025-02-01', desc:'Crunch roll (Dec catch‑up)', amount:7.99, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2025-01-01', desc:'Crunch roll', amount:7.99, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2025-02-01', desc:'Crunch roll', amount:7.99, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2025-02-07', desc:'Moana 2', amount:29.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2025-01-25', desc:'Sonic 3', amount:24.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2025-02-01', desc:'Stars split ending', amount:5.50, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2025-01-01', desc:'Stars split ending', amount:5.50, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-12-01', desc:'Stars split ending (Dec)', amount:5.50, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2025-01-12', desc:'Lost Boys', amount:7.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2025-12-31', desc:'Wicked', amount:29.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2025-12-24', desc:'Gladiator 2', amount:24.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2025-12-08', desc:'Clint Eastwood movies', amount:9.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2025-03-01', desc:'Crunch roll (Mar)', amount:7.99, category:'Subscriptions', type:'purchase', settled:true},
+    const filterAllBtn = document.getElementById('filterAll');
+    const filterSubscriptionsBtn = document.getElementById('filterSubscriptions');
+    const filterMoviesBtn = document.getElementById('filterMovies');
+    const filterGamesBtn = document.getElementById('filterGames');
 
-    // OLD tab 2024–2019 condensed (all settled:true)[file:199]
-    {date:'2024-11-01', desc:'Hulu Stars MGM', amount:20.00, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-11-01', desc:'Crunch roll', amount:7.99, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-11-01', desc:'Oct bill past due', amount:82.97, category:'Other', type:'purchase', settled:true},
-    {date:'2024-11-01', desc:'Golf', amount:55.00, category:'Events/Trips', type:'purchase', settled:true},
+    let allRows = [];
+    let activeFilter = 'all';
 
-    {date:'2024-10-01', desc:'Hulu Stars MGM', amount:20.00, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-10-01', desc:'Crunch roll', amount:7.99, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-10-01', desc:'Robot movie', amount:29.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2024-10-01', desc:'Deadpool', amount:24.99, category:'Movies', type:'purchase', settled:true},
-
-    {date:'2024-09-01', desc:'Hulu Stars MGM', amount:20.00, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-09-01', desc:'Crunch roll', amount:7.99, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-09-01', desc:'Behind balance', amount:158.98, category:'Other', type:'purchase', settled:true},
-
-    {date:'2024-08-01', desc:'Hulu Stars MGM', amount:20.00, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-08-01', desc:'Sword', amount:71.00, category:'Movies', type:'purchase', settled:true},
-
-    {date:'2024-07-01', desc:'Hulu Stars MGM', amount:20.00, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-07-01', desc:'Inside Out 2', amount:15.00, category:'Movies', type:'purchase', settled:true},
-    {date:'2024-07-01', desc:'Crunch roll', amount:7.99, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-07-01', desc:'Deadpool 24.99', amount:24.99, category:'Movies', type:'purchase', settled:true},
-
-    {date:'2024-06-01', desc:'Hulu Stars MGM', amount:20.00, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-06-01', desc:'Travel pants', amount:12.98, category:'Other', type:'purchase', settled:true},
-    {date:'2024-06-01', desc:'Hero anime', amount:19.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2024-06-01', desc:'Crunch roll', amount:7.99, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-06-01', desc:'Swordsman', amount:15.97, category:'Movies', type:'purchase', settled:true},
-    {date:'2024-06-01', desc:'Disp 4', amount:14.00, category:'Movies', type:'purchase', settled:true},
-
-    {date:'2024-05-01', desc:'Hulu Stars MGM', amount:20.00, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-05-01', desc:'Civil war movie', amount:25.00, category:'Movies', type:'purchase', settled:true},
-
-    {date:'2024-04-01', desc:'Hulu Stars MGM (40)', amount:40.00, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-04-01', desc:'Kung Fu Panda', amount:29.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2024-04-01', desc:'Devil interview', amount:14.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2024-04-01', desc:'Vegas', amount:100.00, category:'Events/Trips', type:'purchase', settled:true},
-    {date:'2024-04-01', desc:'Roblox', amount:20.00, category:'Games/Robux', type:'purchase', settled:true},
-
-    {date:'2024-03-01', desc:'Hulu Stars MGM', amount:19.99, category:'Subscriptions', type:'purchase', settled:true},
-
-    {date:'2024-02-01', desc:'Hulu Stars MGM', amount:19.99, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-02-01', desc:'Roblox', amount:20.00, category:'Games/Robux', type:'purchase', settled:true},
-    {date:'2024-02-01', desc:'The shift', amount:20.00, category:'Movies', type:'purchase', settled:true},
-
-    {date:'2024-01-01', desc:'Hulu Stars MGM', amount:18.99, category:'Subscriptions', type:'purchase', settled:true},
-    {date:'2024-01-01', desc:'Wish', amount:19.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2024-01-01', desc:'Migration', amount:24.99, category:'Movies', type:'purchase', settled:true},
-    {date:'2024-01-01', desc:'Wonka', amount:24.99, category:'Movies', type:'purchase', settled:true},
-
-    // (2023–2019 block identical to last message, all purchases, all settled:true)[file:199]
-];
-
-let history = [];
-let balance = 0;
-
-function drawCategoryChart() {
-    const canvas = document.getElementById('categoryChart');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const w = canvas.width = canvas.clientWidth;
-    const h = canvas.height = 200;
-
-    ctx.clearRect(0,0,w,h);
-    const categoryTotals = {};
-
-    history.forEach(item => {
-        if (item.type === 'purchase') {
-            if (!categoryTotals[item.category]) categoryTotals[item.category] = 0;
-            categoryTotals[item.category] += item.amount;
-        }
-    });
-
-    const categories = Object.keys(categoryTotals);
-    if (categories.length === 0) return;
-
-    const maxVal = Math.max(...categories.map(c => categoryTotals[c]));
-    const padding = 30;
-    const chartWidth = w - padding * 2;
-    const chartHeight = h - padding * 2;
-    const barWidth = chartWidth / (categories.length * 1.5);
-
-    ctx.font = '11px -apple-system,system-ui,sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-
-    categories.forEach((cat, i) => {
-        const val = categoryTotals[cat];
-        const x = padding + i * (barWidth * 1.5) + barWidth / 2;
-        const barHeight = maxVal === 0 ? 0 : (val / maxVal) * chartHeight;
-        const y = h - padding - barHeight;
-
-        const grad = ctx.createLinearGradient(0,y,0,y+barHeight);
-        grad.addColorStop(0,'#39c66f');
-        grad.addColorStop(1,'#8ad3ff');
-        ctx.fillStyle = grad;
-        ctx.fillRect(x - barWidth/2, y, barWidth, barHeight);
-
-        ctx.fillStyle = '#e5f5ea';
-        ctx.fillText('$' + val.toFixed(0), x, y - 4);
-
-        ctx.save();
-        ctx.translate(x, h - padding + 14);
-        ctx.rotate(-Math.PI/6);
-        ctx.fillStyle = '#9fb8aa';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(cat, 0, 0);
-        ctx.restore();
-    });
-
-    const totalAll = categories.reduce((sum,c)=>sum+categoryTotals[c],0);
-    document.getElementById('chartMeta').textContent =
-        'Total spent across categories: $' + totalAll.toFixed(2) +
-        ' (historic + new, chart stays smaller than the main account info).';
-}
-
-function formatMoney(a) {
-    return '$' + a.toFixed(2);
-}
-
-function showNotification(msg) {
-    const n = document.getElementById('notification');
-    n.textContent = msg;
-    n.classList.add('show');
-    setTimeout(()=>n.classList.remove('show'), 2000);
-}
-
-function recomputeTotals() {
-    balance = 0;
-
-    history.forEach(item => {
-        if (item.type === 'purchase' && !item.settled) {
-            balance += item.amount;
-        }
-        if (item.type === 'payment') {
-            balance += item.amount; // payment is negative, reduces balance
-        }
-    });
-
-    document.getElementById('balanceOwed').textContent = formatMoney(balance);
-}
-
-function renderHistory() {
-    const list = document.getElementById('historyList');
-    list.innerHTML = '';
-
-    const items = [...history].sort((a,b)=>new Date(b.date)-new Date(a.date));
-    items.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'history-item';
-
-        const isPurchase = item.type === 'purchase';
-        const amtClass = isPurchase ? 'negative' : 'positive';
-        const sign = isPurchase ? '-' : '+';
-        const note = isPurchase
-            ? (item.settled ? 'Purchase (already settled)' : 'Purchase (still owed)')
-            : 'Payment';
-
-        div.innerHTML = `
-            <div class="h-date">${item.date}</div>
-            <div class="h-main">
-                <div class="h-desc">${item.desc}</div>
-                <div class="h-note">${item.category} • ${note}</div>
-            </div>
-            <div>
-                <div class="h-amt ${amtClass}">${sign}${formatMoney(Math.abs(item.amount))}</div>
-                <div class="h-bal">See balance at top</div>
-            </div>
-        `;
-        list.appendChild(div);
-    });
-}
-
-function saveState() {
-    const payload = { history };
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch(e){}
-}
-
-function loadState() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed.history)) {
-                history = parsed.history;
-                return;
-            }
-        }
-    } catch(e){}
-    history = seededHistory.slice(); // all settled, so starting balance is 0.
-}
-
-function addPurchase() {
-    const dateEl = document.getElementById('dateInput');
-    const descEl = document.getElementById('descInput');
-    const amtEl  = document.getElementById('amountInput');
-    const catEl  = document.getElementById('categoryInput');
-
-    const date = dateEl.value || new Date().toISOString().slice(0,10);
-    const desc = (descEl.value || '').trim();
-    const amount = parseFloat(amtEl.value);
-    const category = catEl.value || 'Other';
-
-    if (!desc) { showNotification('Add a description.'); return; }
-    if (isNaN(amount) || amount <= 0) { showNotification('Enter a valid positive amount.'); return; }
-
-    history.push({
-        date,
-        desc,
-        amount,
-        category,
-        type:'purchase',
-        settled:false   // new items are owed now
-    });
-
-    recomputeTotals();
-    renderHistory();
-    drawCategoryChart();
-    saveState();
-
-    descEl.value = '';
-    amtEl.value = '';
-    showNotification('New purchase added for Pike.');
-}
-
-function markPaidInFull() {
-    recomputeTotals();
-    if (balance <= 0) {
-        showNotification('Nothing owed right now.');
-        return;
+    function formatMoney(value) {
+      const n = Number(value) || 0;
+      const sign = n < 0 ? '-' : '';
+      return sign + '$' + Math.abs(n).toFixed(2);
     }
-    const today = new Date().toISOString().slice(0,10);
-    history.push({
-        date: today,
-        desc: 'Paid in full',
-        amount: -balance,
-        category: 'Other',
-        type: 'payment',
-        settled:true
-    });
-    history.forEach(item => {
-        if (item.type === 'purchase' && !item.settled) {
-            item.settled = true;
+
+    function computeStats(rows) {
+      let balance = 0;
+      let totalCharges = 0;
+      let totalPayments = 0;
+      const byCategory = {};
+      const byType = { expense: 0, income: 0 };
+
+      for (const row of rows) {
+        const amt = Number(row.amount) || 0;
+        if (row.type === 'expense') {
+          balance -= amt;
+          totalCharges += amt;
+        } else if (row.type === 'income') {
+          balance += amt;
+          totalPayments += amt;
         }
+        const cat = row.category || 'other';
+        if (!byCategory[cat]) byCategory[cat] = 0;
+        byCategory[cat] += amt;
+        if (!byType[row.type]) byType[row.type] = 0;
+        byType[row.type] += amt;
+      }
+
+      return { balance, totalCharges, totalPayments, byCategory, byType };
+    }
+
+    function renderTable(rows) {
+      historyBody.innerHTML = '';
+      for (const row of rows) {
+        const tr = document.createElement('tr');
+        tr.className = row.type === 'income' ? 'income' : 'expense';
+
+        const dateTd = document.createElement('td');
+        dateTd.textContent = row.date || '';
+        tr.appendChild(dateTd);
+
+        const descTd = document.createElement('td');
+        descTd.textContent = row.desc || '';
+        tr.appendChild(descTd);
+
+        const amtTd = document.createElement('td');
+        amtTd.textContent = formatMoney(row.amount);
+        tr.appendChild(amtTd);
+
+        const catTd = document.createElement('td');
+        const cat = row.category || 'other';
+        const catSpan = document.createElement('span');
+        catSpan.className = 'pill';
+        catSpan.textContent = cat;
+        catTd.appendChild(catSpan);
+        tr.appendChild(catTd);
+
+        const typeTd = document.createElement('td');
+        const typeSpan = document.createElement('span');
+        typeSpan.className = 'pill';
+        typeSpan.textContent = row.type === 'income' ? 'Payment' : 'Charge';
+        typeTd.appendChild(typeSpan);
+        tr.appendChild(typeTd);
+
+        historyBody.appendChild(tr);
+      }
+    }
+
+    function renderSummary(rows) {
+      const stats = computeStats(rows);
+      currentBalanceEl.textContent = formatMoney(stats.balance);
+
+      summaryStatsEl.textContent =
+        'Total charges: ' + formatMoney(stats.totalCharges) +
+        ' · Total payments: ' + formatMoney(stats.totalPayments);
+
+      categoryChipsEl.innerHTML = '';
+      const cats = Object.keys(stats.byCategory);
+      if (cats.length === 0) {
+        categoryChipsEl.textContent = 'No data yet.';
+      } else {
+        for (const cat of cats) {
+          const chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.textContent = cat;
+          const valSpan = document.createElement('span');
+          valSpan.textContent = formatMoney(stats.byCategory[cat]);
+          chip.appendChild(valSpan);
+          categoryChipsEl.appendChild(chip);
+        }
+      }
+
+      typeChipsEl.innerHTML = '';
+      const typeMap = { expense: 'Charges', income: 'Payments' };
+      for (const key of Object.keys(stats.byType)) {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.textContent = typeMap[key] || key;
+        const valSpan = document.createElement('span');
+        valSpan.textContent = formatMoney(stats.byType[key]);
+        chip.appendChild(valSpan);
+        typeChipsEl.appendChild(chip);
+      }
+
+      rowCountLabel.textContent = rows.length + ' row' + (rows.length === 1 ? '' : 's');
+    }
+
+    function applyFilter() {
+      let filtered = allRows;
+      if (activeFilter === 'subscriptions') {
+        filtered = allRows.filter(r => r.category === 'subscription');
+        filterLabel.textContent = 'Showing: Subscriptions';
+      } else if (activeFilter === 'movies') {
+        filtered = allRows.filter(r => r.category === 'movie');
+        filterLabel.textContent = 'Showing: Movies';
+      } else if (activeFilter === 'games') {
+        filtered = allRows.filter(r => r.category === 'game');
+        filterLabel.textContent = 'Showing: Games';
+      } else {
+        filterLabel.textContent = 'Showing: All';
+      }
+      renderTable(filtered);
+      renderSummary(filtered);
+    }
+
+    filterAllBtn.addEventListener('click', () => {
+      activeFilter = 'all';
+      applyFilter();
+    });
+    filterSubscriptionsBtn.addEventListener('click', () => {
+      activeFilter = 'subscriptions';
+      applyFilter();
+    });
+    filterMoviesBtn.addEventListener('click', () => {
+      activeFilter = 'movies';
+      applyFilter();
+    });
+    filterGamesBtn.addEventListener('click', () => {
+      activeFilter = 'games';
+      applyFilter();
     });
 
-    recomputeTotals();   // balance now 0
-    renderHistory();
-    drawCategoryChart();
-    saveState();
-    showNotification('Marked as paid in full.');
-}
+    async function loadHistory() {
+      formError.textContent = '';
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        if (!data.success) {
+          throw new Error(data.error || 'Unknown error from server');
+        }
+        allRows = data.rows || [];
+        applyFilter();
+      } catch (err) {
+        formError.textContent = 'Error loading history: ' + err.message;
+      }
+    }
 
-// Init
-loadState();
-recomputeTotals(); // with all seeds settled and no negatives, this renders $0.00
-renderHistory();
-window.addEventListener('load', drawCategoryChart);
-window.addEventListener('resize', drawCategoryChart);
-</script>
+    async function addRow() {
+      formError.textContent = '';
+      const desc = document.getElementById('desc').value.trim();
+      const amountStr = document.getElementById('amount').value;
+      const category = document.getElementById('category').value;
+      const type = document.getElementById('type').value;
+
+      if (!desc) {
+        formError.textContent = 'Please enter a description.';
+        return;
+      }
+      const amount = Number(amountStr);
+      if (!amount || amount <= 0) {
+        formError.textContent = 'Please enter a positive amount.';
+        return;
+      }
+
+      addBtn.disabled = true;
+      saveSpinner.style.display = 'inline';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add',
+            desc,
+            amount,
+            category,
+            type
+          })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          throw new Error(data.error || 'Unknown error from server');
+        }
+
+        document.getElementById('amount').value = '';
+        document.getElementById('desc').value = '';
+
+        allRows = data.rows || [];
+        applyFilter();
+      } catch (err) {
+        formError.textContent = 'Error saving: ' + err.message;
+      } finally {
+        addBtn.disabled = false;
+        saveSpinner.style.display = 'none';
+      }
+    }
+
+    addBtn.addEventListener('click', addRow);
+
+    loadHistory();
+  </script>
 </body>
 </html>
